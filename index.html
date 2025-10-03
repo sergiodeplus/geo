@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-  <head>
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>População, Energia e Economia da Europa</title>
@@ -9,984 +9,886 @@
     <script src="https://cdn.plot.ly/plotly-2.31.1.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap"
-      rel="stylesheet"
-    />
-    <!-- Chosen Palette: Estudo Calmo Aprofundado (Ciano, Roxo Suave, Neutros) -->
-    <!-- Application Structure Plan: Estrutura de Dashboard com 6 eixos: Demografia, Diversidade, Regiões/Fluxos (Mapa Conceitual), Energia (Gráficos), Blocos Econômicos e Quiz. A arquitetura é modular para tratar cada tema do 9º ano de forma isolada e visual. A interação simula a exploração geográfica e econômica. -->
-    <!-- Visualization & Content Choices: Regiões/Fluxos -> Mapa Conceitual (HTML/CSS) com botões clicáveis para simular regiões e atualizar dados. Energia -> Gráfico de Barras e Linha (Chart.js) para consumo e metas de renováveis. Blocos -> Painéis interativos (Tabs/Cards) para comparar UE e EFTA. NO SVG/Mermaid. -->
-    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <style>
-      body {
-        font-family: "Inter", sans-serif;
-      }
-      .chart-container {
-        position: relative;
-        width: 100%;
-        max-width: 650px;
-        margin-left: auto;
-        margin-right: auto;
-        height: 320px;
-        max-height: 40vh;
-      }
-      .tab-button {
-        transition: all 0.2s ease-in-out;
-      }
-      .tab-button.active {
-        background-color: #06b6d4;
-        color: white;
-        box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.4),
-          0 2px 4px -1px rgba(6, 182, 212, 0.2);
-      }
-      .card {
-        transition: transform 0.3s ease, box-shadow 0.3s ease;
-      }
-      .card:hover {
-        transform: translateY(-3px);
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1),
-          0 4px 6px -2px rgba(0, 0, 0, 0.05);
-      }
-      .feedback {
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 0.375rem;
-        margin-top: 0.75rem;
-      }
-      .feedback-correct {
-        background-color: #dcfce7;
-        color: #166534;
-      }
-      .feedback-incorrect {
-        background-color: #fee2e2;
-        color: #991b1b;
-      }
-      .region-btn {
-        transition: background-color 0.2s, transform 0.2s;
-      }
-      .region-btn.active {
-        background-color: #06b6d4 !important;
-        color: white !important;
-        transform: scale(1.05);
-      }
+        body {
+            font-family: "Inter", sans-serif;
+        }
+        .chart-container {
+            position: relative;
+            width: 100%;
+            height: 320px;
+        }
+        .tab-button {
+            transition: all 0.2s ease-in-out;
+        }
+        .tab-button.active {
+            background-color: #06b6d4;
+            color: white;
+            box-shadow: 0 4px 6px -1px rgba(6, 182, 212, 0.4), 0 2px 4px -1px rgba(6, 182, 212, 0.2);
+        }
+        .card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .feedback {
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            margin-top: 0.75rem;
+        }
+        .feedback-correct {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+        .feedback-incorrect {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+        .region-btn {
+            transition: background-color 0.2s, transform 0.2s;
+        }
+        .region-btn.active {
+            background-color: #06b6d4 !important;
+            color: white !important;
+            transform: scale(1.05);
+        }
+        @media (max-width: 768px) {
+            .chart-container {
+                height: 250px;
+            }
+            .nav-link {
+                font-size: 0.8rem;
+                padding: 0.5rem 0.75rem;
+            }
+        }
     </style>
-  </head>
-  <body class="bg-slate-50 text-slate-800">
+</head>
+<body class="bg-slate-50 text-slate-800">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <header class="text-center mb-12">
-        <h1 class="text-4xl font-extrabold text-slate-900">
-          Geografia: Europa - População, Energia e Blocos
-        </h1>
-        <p class="mt-2 text-xl text-slate-600">
-          Um estudo interativo sobre os principais temas da Europa no 9º ano.
-        </p>
-      </header>
-
-      <nav
-        class="flex flex-wrap justify-center border-b border-slate-200 mb-12"
-      >
-        <button
-          data-target="demografia"
-          class="nav-link active text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 text-cyan-700 border-cyan-700"
-        >
-          1. Demografia
-        </button>
-        <button
-          data-target="diversidade"
-          class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent"
-        >
-          2. Diversidade
-        </button>
-        <button
-          data-target="regioes"
-          class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent"
-        >
-          3. Regiões e Fluxos
-        </button>
-        <button
-          data-target="energia"
-          class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent"
-        >
-          4. Fontes de Energia
-        </button>
-        <button
-          data-target="blocos"
-          class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent"
-        >
-          5. Blocos Econômicos
-        </button>
-        <button
-          data-target="quiz"
-          class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent"
-        >
-          6. Quiz Interativo
-        </button>
-      </nav>
-
-      <main class="space-y-12">
-        <!-- SEÇÃO 1: CRISE DEMOGRÁFICA E ENVELHECIMENTO -->
-        <section id="demografia" class="content-section">
-          <div
-            class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card"
-          >
-            <h2
-              class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100"
-            >
-              1. O Envelhecimento do Continente
-            </h2>
-            <p class="text-lg text-slate-600 mb-6">
-              Esta seção compara a taxa de natalidade (em queda) com a
-              expectativa de vida (em alta), revelando visualmente a principal
-              questão demográfica da Europa: o envelhecimento populacional e o
-              declínio do crescimento natural.
+        <header class="text-center mb-12">
+            <h1 class="text-3xl md:text-4xl font-extrabold text-slate-900">
+                Geografia: Europa - População, Energia e Blocos
+            </h1>
+            <p class="mt-2 text-lg text-slate-600">
+                Um estudo interativo sobre os principais temas da Europa no 9º ano.
             </p>
+        </header>
 
-            <div class="grid lg:grid-cols-3 gap-6">
-              <div class="lg:col-span-2">
-                <div class="chart-container">
-                  <canvas id="demographicChart"></canvas>
+        <nav class="flex flex-wrap justify-center border-b border-slate-200 mb-12">
+            <button data-target="demografia" class="nav-link active text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 text-cyan-700 border-cyan-700">
+                1. Demografia
+            </button>
+            <button data-target="diversidade" class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent">
+                2. Diversidade
+            </button>
+            <button data-target="regioes" class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent">
+                3. Regiões e Fluxos
+            </button>
+            <button data-target="energia" class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent">
+                4. Fontes de Energia
+            </button>
+            <button data-target="blocos" class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent">
+                5. Blocos Econômicos
+            </button>
+            <button data-target="quiz" class="nav-link text-sm sm:text-base font-medium py-3 px-2 sm:px-4 border-b-2 border-transparent">
+                6. Quiz Interativo
+            </button>
+        </nav>
+
+        <main class="space-y-12">
+            <!-- SEÇÃO 1: CRISE DEMOGRÁFICA E ENVELHECIMENTO -->
+            <section id="demografia" class="content-section">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100">
+                        1. O Envelhecimento do Continente
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-6">
+                        Esta seção compara a taxa de natalidade (em queda) com a
+                        expectativa de vida (em alta), revelando visualmente a principal
+                        questão demográfica da Europa: o envelhecimento populacional e o
+                        declínio do crescimento natural.
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                        <div class="lg:col-span-2">
+                            <div class="chart-container">
+                                <canvas id="demographicChart"></canvas>
+                            </div>
+                        </div>
+                        <div class="lg:col-span-1 space-y-4">
+                            <div class="p-4 bg-red-50 rounded-lg border border-red-200">
+                                <p class="font-bold text-red-600">
+                                    Taxa de Natalidade (Estimada)
+                                </p>
+                                <p class="text-3xl font-extrabold text-red-800" id="birthRateDisplay">
+                                    9.8
+                                </p>
+                                <p class="text-sm text-slate-500">
+                                    nascimentos por 1000 hab.
+                                </p>
+                            </div>
+                            <div class="p-4 bg-green-50 rounded-lg border border-green-200">
+                                <p class="font-bold text-green-600">
+                                    Expectativa de Vida (Média)
+                                </p>
+                                <p class="text-3xl font-extrabold text-green-800" id="lifeExpectancyDisplay">
+                                    81.5
+                                </p>
+                                <p class="text-sm text-slate-500">anos</p>
+                            </div>
+                            <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                <p class="font-bold text-blue-600">
+                                    População Total (Aprox.)
+                                </p>
+                                <p class="text-2xl font-extrabold text-blue-800">
+                                    ~740 Milhões
+                                </p>
+                                <p class="text-sm text-slate-500">
+                                    O crescimento é mantido pela imigração.
+                                </p>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-              <div class="lg:col-span-1 space-y-4">
-                <div class="p-4 bg-red-50 rounded-lg border border-red-200">
-                  <p class="font-bold text-red-600">
-                    Taxa de Natalidade (Estimada)
-                  </p>
-                  <p
-                    class="text-3xl font-extrabold text-red-800"
-                    id="birthRateDisplay"
-                  >
-                    9.8
-                  </p>
-                  <p class="text-sm text-slate-500">
-                    nascimentos por 1000 hab.
-                  </p>
+            </section>
+
+            <!-- SEÇÃO 2: MOSAICO CULTURAL E LINGUÍSTICO -->
+            <section id="diversidade" class="content-section hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100">
+                        2. O Mosaico Cultural Europeu
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-6">
+                        A Europa é um centro de convergência. Sua população é formada por
+                        grandes famílias linguísticas, resultado de séculos de história e
+                        migrações. Explore as três principais:
+                    </p>
+
+                    <div class="flex flex-wrap justify-center space-x-2 mb-6">
+                        <button data-group="latina" class="lang-button active bg-cyan-600 text-white font-medium py-2 px-4 rounded-lg mb-2">
+                            Latinos
+                        </button>
+                        <button data-group="germanica" class="lang-button bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-lg hover:bg-slate-300 mb-2">
+                            Germânicos
+                        </button>
+                        <button data-group="eslava" class="lang-button bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-lg hover:bg-slate-300 mb-2">
+                            Eslavos
+                        </button>
+                    </div>
+
+                    <div id="languageContent" class="p-6 bg-slate-100 rounded-lg border border-slate-200 min-h-[150px]">
+                        <!-- Conteúdo dinâmico será injetado aqui -->
+                    </div>
                 </div>
-                <div class="p-4 bg-green-50 rounded-lg border border-green-200">
-                  <p class="font-bold text-green-600">
-                    Expectativa de Vida (Média)
-                  </p>
-                  <p
-                    class="text-3xl font-extrabold text-green-800"
-                    id="lifeExpectancyDisplay"
-                  >
-                    81.5
-                  </p>
-                  <p class="text-sm text-slate-500">anos</p>
+            </section>
+
+            <!-- SEÇÃO 3: EXPLORAÇÃO REGIONAL E FLUXOS (MAPA INTERATIVO PLOTLY) -->
+            <section id="regioes" class="content-section hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100">
+                        3. Regiões e Fluxos Migratórios (Mapa)
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-6">
+                        Explore o mapa geográfico! Clique em um país ou região colorida
+                        para ver como os desafios populacionais (envelhecimento, imigração
+                        e emigração) se manifestam em cada área da Europa.
+                    </p>
+
+                    <!-- PLOTLY MAP CONTAINER -->
+                    <div id="europeMap" class="w-full h-[400px] bg-slate-100 rounded-xl shadow-inner mb-6">
+                        <p class="p-4 text-center text-slate-500">
+                            Carregando Mapa Interativo...
+                        </p>
+                    </div>
+
+                    <div id="regionContent" class="p-6 bg-slate-100 rounded-lg border border-slate-200 min-h-[180px]">
+                        <h3 class="text-xl font-bold text-green-700 mb-2" id="mapTitle">
+                            Centro-Oeste
+                        </h3>
+                        <p class="font-semibold text-slate-800 mb-2" id="mapStatus">
+                            Status: Principal Destino de Imigração
+                        </p>
+                        <p class="text-slate-700" id="mapChallenges">
+                            Enfrentam a crise demográfica (baixo nascimento), mas a forte
+                            economia atrai imigrantes qualificados, mantendo a força de
+                            trabalho ativa. O principal desafio é a **integração social e
+                            cultural** dos novos habitantes.
+                        </p>
+                    </div>
                 </div>
-                <div class="p-4 bg-blue-50 rounded-lg border border-blue-200">
-                  <p class="font-bold text-blue-600">
-                    População Total (Aprox.)
-                  </p>
-                  <p class="text-2xl font-extrabold text-blue-800">
-                    ~740 Milhões
-                  </p>
-                  <p class="text-sm text-slate-500">
-                    O crescimento é mantido pela imigração.
-                  </p>
+            </section>
+
+            <!-- SEÇÃO 4: FONTES DE ENERGIA -->
+            <section id="energia" class="content-section hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100">
+                        4. Fontes de Energia na Europa
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-6">
+                        A matriz energética europeia é fundamental para entender sua
+                        geopolítica e as metas climáticas. O bloco busca a transição para
+                        fontes mais limpas.
+                    </p>
+
+                    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-semibold mb-3 text-slate-700">
+                                Consumo Atual (Est.)
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="energyMixChart"></canvas>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-semibold mb-3 text-slate-700">
+                                Avanço das Renováveis (%)
+                            </h3>
+                            <div class="chart-container">
+                                <canvas id="renewableTrendChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
+            </section>
 
-        <!-- SEÇÃO 2: MOSAICO CULTURAL E LINGUÍSTICO -->
-        <section id="diversidade" class="content-section hidden">
-          <div
-            class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card"
-          >
-            <h2
-              class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100"
-            >
-              2. O Mosaico Cultural Europeu
-            </h2>
-            <p class="text-lg text-slate-600 mb-6">
-              A Europa é um centro de convergência. Sua população é formada por
-              grandes famílias linguísticas, resultado de séculos de história e
-              migrações. Explore as três principais:
-            </p>
+            <!-- SEÇÃO 5: BLOCOS ECONÔMICOS -->
+            <section id="blocos" class="content-section hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100">
+                        5. Blocos Econômicos
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-6">
+                        A União Europeia é o principal bloco, mas não o único. Clique para
+                        comparar os modelos de integração na Europa.
+                    </p>
 
-            <div class="flex justify-center space-x-4 mb-6">
-              <button
-                data-group="latina"
-                class="lang-button active bg-cyan-600 text-white font-medium py-2 px-6 rounded-lg"
-              >
-                Latinos
-              </button>
-              <button
-                data-group="germanica"
-                class="lang-button bg-slate-200 text-slate-700 font-medium py-2 px-6 rounded-lg hover:bg-slate-300"
-              >
-                Germânicos
-              </button>
-              <button
-                data-group="eslava"
-                class="lang-button bg-slate-200 text-slate-700 font-medium py-2 px-6 rounded-lg hover:bg-slate-300"
-              >
-                Eslavos
-              </button>
-            </div>
+                    <div class="flex flex-wrap justify-center space-x-2 mb-6">
+                        <button data-block="ue" class="block-button active bg-cyan-600 text-white font-medium py-2 px-4 rounded-lg mb-2">
+                            União Europeia (UE)
+                        </button>
+                        <button data-block="efta" class="block-button bg-slate-200 text-slate-700 font-medium py-2 px-4 rounded-lg hover:bg-slate-300 mb-2">
+                            EFTA
+                        </button>
+                    </div>
 
-            <div
-              id="languageContent"
-              class="p-6 bg-slate-100 rounded-lg border border-slate-200 min-h-[150px]"
-            >
-              <!-- Conteúdo dinâmico será injetado aqui -->
-            </div>
-          </div>
-        </section>
-
-        <!-- SEÇÃO 3: EXPLORAÇÃO REGIONAL E FLUXOS (MAPA INTERATIVO PLOTLY) -->
-        <section id="regioes" class="content-section hidden">
-          <div
-            class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card"
-          >
-            <h2
-              class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100"
-            >
-              3. Regiões e Fluxos Migratórios (Mapa)
-            </h2>
-            <p class="text-lg text-slate-600 mb-6">
-              Explore o mapa geográfico! Clique em um país ou região colorida
-              para ver como os desafios populacionais (envelhecimento, imigração
-              e emigração) se manifestam em cada área da Europa.
-            </p>
-
-            <!-- PLOTLY MAP CONTAINER -->
-            <div
-              id="europeMap"
-              class="w-full h-[450px] bg-slate-100 rounded-xl shadow-inner mb-6"
-            >
-              <p class="p-4 text-center text-slate-500">
-                Carregando Mapa Interativo...
-              </p>
-            </div>
-
-            <div
-              id="regionContent"
-              class="p-6 bg-slate-100 rounded-lg border border-slate-200 min-h-[180px]"
-            >
-              <h3 class="text-xl font-bold text-green-700 mb-2" id="mapTitle">
-                Centro-Oeste
-              </h3>
-              <p class="font-semibold text-slate-800 mb-2" id="mapStatus">
-                Status: Principal Destino de Imigração
-              </p>
-              <p class="text-slate-700" id="mapChallenges">
-                Enfrentam a crise demográfica (baixo nascimento), mas a forte
-                economia atrai imigrantes qualificados, mantendo a força de
-                trabalho ativa. O principal desafio é a **integração social e
-                cultural** dos novos habitantes.
-              </p>
-            </div>
-          </div>
-        </section>
-
-        <!-- SEÇÃO 4: FONTES DE ENERGIA -->
-        <section id="energia" class="content-section hidden">
-          <div
-            class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card"
-          >
-            <h2
-              class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100"
-            >
-              4. Fontes de Energia na Europa
-            </h2>
-            <p class="text-lg text-slate-600 mb-6">
-              A matriz energética europeia é fundamental para entender sua
-              geopolítica e as metas climáticas. O bloco busca a transição para
-              fontes mais limpas.
-            </p>
-
-            <div class="grid lg:grid-cols-2 gap-8">
-              <div>
-                <h3 class="text-xl font-semibold mb-3 text-slate-700">
-                  Consumo Atual (Est.)
-                </h3>
-                <div class="chart-container">
-                  <canvas id="energyMixChart"></canvas>
+                    <div id="blockContent" class="p-6 bg-slate-100 rounded-lg border border-slate-200 min-h-[180px]">
+                        <!-- Conteúdo dinâmico será injetado aqui -->
+                    </div>
                 </div>
-              </div>
-              <div>
-                <h3 class="text-xl font-semibold mb-3 text-slate-700">
-                  Avanço das Renováveis (%)
-                </h3>
-                <div class="chart-container">
-                  <canvas id="renewableTrendChart"></canvas>
+            </section>
+
+            <!-- SEÇÃO 6: TESTES INTERATIVOS (QUIZ) -->
+            <section id="quiz" class="content-section hidden">
+                <div class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card">
+                    <h2 class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100">
+                        6. Testes Interativos
+                    </h2>
+                    <p class="text-lg text-slate-600 mb-8">
+                        Verifique seu conhecimento sobre o tema. Escolha a resposta e
+                        clique em 'Verificar'.
+                    </p>
+
+                    <div class="space-y-8 max-w-3xl mx-auto">
+                        <!-- Pergunta 1 -->
+                        <div class="border-b pb-4">
+                            <p class="font-semibold text-lg mb-3">
+                                1. Qual é a principal consequência demográfica do cruzamento
+                                entre a baixa taxa de natalidade e a alta expectativa de vida
+                                na Europa?
+                            </p>
+                            <div class="space-y-2" data-question="1" data-correct="B">
+                                <label class="block">
+                                    <input type="radio" name="q1" value="A" class="mr-2" /> A)
+                                    Crescimento vegetativo acelerado.
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q1" value="B" class="mr-2" /> B)
+                                    Envelhecimento populacional.
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q1" value="C" class="mr-2" /> C)
+                                    Alta densidade em áreas rurais.
+                                </label>
+                            </div>
+                            <button class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700" data-q="1">
+                                Verificar
+                            </button>
+                            <div id="feedback-q1" class="feedback hidden"></div>
+                        </div>
+
+                        <!-- Pergunta 2 -->
+                        <div class="border-b pb-4">
+                            <p class="font-semibold text-lg mb-3">
+                                2. O principal objetivo do estágio mais avançado da União
+                                Europeia (após a Zona de Livre Comércio) é:
+                            </p>
+                            <div class="space-y-2" data-question="2" data-correct="A">
+                                <label class="block">
+                                    <input type="radio" name="q2" value="A" class="mr-2" /> A)
+                                    Criar um Mercado Único com livre circulação de pessoas, bens
+                                    e capital.
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q2" value="B" class="mr-2" /> B)
+                                    Apenas reduzir tarifas de importação entre os países
+                                    membros.
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q2" value="C" class="mr-2" /> C)
+                                    Promover a Guerra Fria contra o bloco Oriental.
+                                </label>
+                            </div>
+                            <button class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700" data-q="2">
+                                Verificar
+                            </button>
+                            <div id="feedback-q2" class="feedback hidden"></div>
+                        </div>
+
+                        <!-- Pergunta 3 -->
+                        <div class="border-b pb-4">
+                            <p class="font-semibold text-lg mb-3">
+                                3. A região europeia com maior desafio de **Emigração** de
+                                jovens qualificados é:
+                            </p>
+                            <div class="space-y-2" data-question="3" data-correct="C">
+                                <label class="block">
+                                    <input type="radio" name="q3" value="A" class="mr-2" /> A)
+                                    Europa do Sul (Itália, Espanha).
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q3" value="B" class="mr-2" /> B)
+                                    Centro-Oeste (Alemanha, França).
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q3" value="C" class="mr-2" /> C)
+                                    Europa do Leste (Polônia, Romênia).
+                                </label>
+                            </div>
+                            <button class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700" data-q="3">
+                                Verificar
+                            </button>
+                            <div id="feedback-q3" class="feedback hidden"></div>
+                        </div>
+
+                        <!-- Pergunta 4 (Nova) -->
+                        <div class="border-b pb-4">
+                            <p class="font-semibold text-lg mb-3">
+                                4. Qual é o principal objetivo da EFTA, que a diferencia da
+                                União Europeia?
+                            </p>
+                            <div class="space-y-2" data-question="4" data-correct="B">
+                                <label class="block">
+                                    <input type="radio" name="q4" value="A" class="mr-2" /> A)
+                                    Livre circulação de pessoas e moeda única.
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q4" value="B" class="mr-2" /> B)
+                                    Foco principal no livre comércio de bens industriais (sem
+                                    integração política e monetária).
+                                </label>
+                                <label class="block">
+                                    <input type="radio" name="q4" value="C" class="mr-2" /> C)
+                                    Política agrícola comum e aduana externa única.
+                                </label>
+                            </div>
+                            <button class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700" data-q="4">
+                                Verificar
+                            </button>
+                            <div id="feedback-q4" class="feedback hidden"></div>
+                        </div>
+                    </div>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- SEÇÃO 5: BLOCOS ECONÔMICOS -->
-        <section id="blocos" class="content-section hidden">
-          <div
-            class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card"
-          >
-            <h2
-              class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100"
-            >
-              5. Blocos Econômicos
-            </h2>
-            <p class="text-lg text-slate-600 mb-6">
-              A União Europeia é o principal bloco, mas não o único. Clique para
-              comparar os modelos de integração na Europa.
-            </p>
-
-            <div class="flex justify-center space-x-4 mb-6">
-              <button
-                data-block="ue"
-                class="block-button active bg-cyan-600 text-white font-medium py-2 px-6 rounded-lg"
-              >
-                União Europeia (UE)
-              </button>
-              <button
-                data-block="efta"
-                class="block-button bg-slate-200 text-slate-700 font-medium py-2 px-6 rounded-lg hover:bg-slate-300"
-              >
-                EFTA
-              </button>
-            </div>
-
-            <div
-              id="blockContent"
-              class="p-6 bg-slate-100 rounded-lg border border-slate-200 min-h-[180px]"
-            >
-              <!-- Conteúdo dinâmico será injetado aqui -->
-            </div>
-          </div>
-        </section>
-
-        <!-- SEÇÃO 6: TESTES INTERATIVOS (QUIZ) -->
-        <section id="quiz" class="content-section hidden">
-          <div
-            class="bg-white p-6 rounded-xl shadow-lg border border-slate-200 card"
-          >
-            <h2
-              class="text-2xl font-bold text-cyan-700 mb-4 border-b pb-2 border-cyan-100"
-            >
-              6. Testes Interativos
-            </h2>
-            <p class="text-lg text-slate-600 mb-8">
-              Verifique seu conhecimento sobre o tema. Escolha a resposta e
-              clique em 'Verificar'.
-            </p>
-
-            <div class="space-y-8 max-w-3xl mx-auto">
-              <!-- Pergunta 1 -->
-              <div class="border-b pb-4">
-                <p class="font-semibold text-lg mb-3">
-                  1. Qual é a principal consequência demográfica do cruzamento
-                  entre a baixa taxa de natalidade e a alta expectativa de vida
-                  na Europa?
-                </p>
-                <div class="space-y-2" data-question="1" data-correct="B">
-                  <label class="block"
-                    ><input type="radio" name="q1" value="A" class="mr-2" /> A)
-                    Crescimento vegetativo acelerado.</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q1" value="B" class="mr-2" /> B)
-                    Envelhecimento populacional.</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q1" value="C" class="mr-2" /> C)
-                    Alta densidade em áreas rurais.</label
-                  >
-                </div>
-                <button
-                  class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700"
-                  data-q="1"
-                >
-                  Verificar
-                </button>
-                <div id="feedback-q1" class="feedback hidden"></div>
-              </div>
-
-              <!-- Pergunta 2 -->
-              <div class="border-b pb-4">
-                <p class="font-semibold text-lg mb-3">
-                  2. O principal objetivo do estágio mais avançado da União
-                  Europeia (após a Zona de Livre Comércio) é:
-                </p>
-                <div class="space-y-2" data-question="2" data-correct="A">
-                  <label class="block"
-                    ><input type="radio" name="q2" value="A" class="mr-2" /> A)
-                    Criar um Mercado Único com livre circulação de pessoas, bens
-                    e capital.</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q2" value="B" class="mr-2" /> B)
-                    Apenas reduzir tarifas de importação entre os países
-                    membros.</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q2" value="C" class="mr-2" /> C)
-                    Promover a Guerra Fria contra o bloco Oriental.</label
-                  >
-                </div>
-                <button
-                  class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700"
-                  data-q="2"
-                >
-                  Verificar
-                </button>
-                <div id="feedback-q2" class="feedback hidden"></div>
-              </div>
-
-              <!-- Pergunta 3 -->
-              <div class="border-b pb-4">
-                <p class="font-semibold text-lg mb-3">
-                  3. A região europeia com maior desafio de **Emigração** de
-                  jovens qualificados é:
-                </p>
-                <div class="space-y-2" data-question="3" data-correct="C">
-                  <label class="block"
-                    ><input type="radio" name="q3" value="A" class="mr-2" /> A)
-                    Europa do Sul (Itália, Espanha).</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q3" value="B" class="mr-2" /> B)
-                    Centro-Oeste (Alemanha, França).</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q3" value="C" class="mr-2" /> C)
-                    Europa do Leste (Polônia, Romênia).</label
-                  >
-                </div>
-                <button
-                  class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700"
-                  data-q="3"
-                >
-                  Verificar
-                </button>
-                <div id="feedback-q3" class="feedback hidden"></div>
-              </div>
-
-              <!-- Pergunta 4 (Nova) -->
-              <div class="border-b pb-4">
-                <p class="font-semibold text-lg mb-3">
-                  4. Qual é o principal objetivo da EFTA, que a diferencia da
-                  União Europeia?
-                </p>
-                <div class="space-y-2" data-question="4" data-correct="B">
-                  <label class="block"
-                    ><input type="radio" name="q4" value="A" class="mr-2" /> A)
-                    Livre circulação de pessoas e moeda única.</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q4" value="B" class="mr-2" /> B)
-                    Foco principal no livre comércio de bens industriais (sem
-                    integração política e monetária).</label
-                  >
-                  <label class="block"
-                    ><input type="radio" name="q4" value="C" class="mr-2" /> C)
-                    Política agrícola comum e aduana externa única.</label
-                  >
-                </div>
-                <button
-                  class="quiz-btn mt-3 bg-slate-600 text-white font-bold py-2 px-5 rounded-md hover:bg-slate-700"
-                  data-q="4"
-                >
-                  Verificar
-                </button>
-                <div id="feedback-q4" class="feedback hidden"></div>
-              </div>
-            </div>
-          </div>
-        </section>
-      </main>
+            </section>
+        </main>
     </div>
 
     <script>
-      document.addEventListener("DOMContentLoaded", function () {
-        // --- DADOS DO APLICATIVO ---
+        document.addEventListener("DOMContentLoaded", function () {
+            // --- DADOS DO APLICATIVO ---
+            const langData = {
+                latina: {
+                    title: "Família Latina (ou Românica)",
+                    description:
+                        "Descendente do Latim (Roma Antiga), esta família é predominante no sul e oeste da Europa. É um forte laço cultural entre nações com grande história de expansão marítima.",
+                    examples: "Espanhol, Francês, Italiano, Português, Romeno.",
+                },
+                germanica: {
+                    title: "Família Germânica",
+                    description:
+                        "Predominante no centro e norte da Europa. Estas línguas têm raízes comuns, mas desenvolveram-se de forma distinta ao longo dos séculos, sendo vitais para as maiores economias do continente.",
+                    examples: "Alemão, Inglês, Holandês, Sueco, Dinamarquês.",
+                },
+                eslava: {
+                    title: "Família Eslava",
+                    description:
+                        "Predominante no leste da Europa. As línguas eslavas são divididas em grupos (Leste, Oeste e Sul) e refletem a complexidade política e histórica da região, especialmente após a Guerra Fria.",
+                    examples: "Russo, Polonês, Tcheco, Ucraniano, Búlgaro.",
+                },
+            };
 
-        const langData = {
-          latina: {
-            title: "Família Latina (ou Românica)",
-            description:
-              "Descendente do Latim (Roma Antiga), esta família é predominante no sul e oeste da Europa. É um forte laço cultural entre nações com grande história de expansão marítima.",
-            examples: "Espanhol, Francês, Italiano, Português, Romeno.",
-          },
-          germanica: {
-            title: "Família Germânica",
-            description:
-              "Predominante no centro e norte da Europa. Estas línguas têm raízes comuns, mas desenvolveram-se de forma distinta ao longo dos séculos, sendo vitais para as maiores economias do continente.",
-            examples: "Alemão, Inglês, Holandês, Sueco, Dinamarquês.",
-          },
-          eslava: {
-            title: "Família Eslava",
-            description:
-              "Predominante no leste da Europa. As línguas eslavas são divididas em grupos (Leste, Oeste e Sul) e refletem a complexidade política e histórica da região, especialmente após a Guerra Fria.",
-            examples: "Russo, Polonês, Tcheco, Ucraniano, Búlgaro.",
-          },
-        };
+            const regionData = {
+                centro_oeste: {
+                    title: "Centro-Oeste (Alemanha, França, Benelux)",
+                    status: "Principal Destino de Imigração",
+                    challenges:
+                        "Enfrentam a crise demográfica (baixo nascimento), mas a forte economia atrai imigrantes qualificados, mantendo a força de trabalho ativa. O principal desafio é a **integração social e cultural** dos novos habitantes.",
+                    color: "text-green-700",
+                },
+                sul: {
+                    title: "Europa do Sul (Itália, Espanha, Grécia, Portugal)",
+                    status: "Maior Envelhecimento",
+                    challenges:
+                        "Possuem a população mais velha da Europa devido à baixíssima natalidade e alta longevidade. O desafio é a **sobrecarga nos sistemas de saúde e previdência** (aposentadorias), com menos jovens para sustentar a economia.",
+                    color: "text-red-700",
+                },
+                leste: {
+                    title: "Europa do Leste (Polônia, Ucrânia, Romênia, Hungria)",
+                    status: "Região de Emigração",
+                    challenges:
+                        "Apesar de historicamente a natalidade ser um pouco maior, a **emigração** (saída) de jovens qualificados em busca de melhores oportunidades no Centro-Oeste é o principal problema. Isso causa despovoamento e falta de mão de obra local.",
+                    color: "text-blue-700",
+                },
+                nulo: {
+                    title: "Região Selecionada",
+                    status: "Clique em um País no Mapa",
+                    challenges:
+                        "Os países vizinhos também possuem dinâmicas populacionais relevantes. Use o mapa para explorar as três principais tendências de migração e demografia na Europa.",
+                    color: "text-slate-500",
+                },
+            };
 
-        const regionData = {
-          centro_oeste: {
-            title: "Centro-Oeste (Alemanha, França, Benelux)",
-            status: "Principal Destino de Imigração",
-            challenges:
-              "Enfrentam a crise demográfica (baixo nascimento), mas a forte economia atrai imigrantes qualificados, mantendo a força de trabalho ativa. O principal desafio é a **integração social e cultural** dos novos habitantes.",
-            color: "text-green-700",
-          },
-          sul: {
-            title: "Europa do Sul (Itália, Espanha, Grécia, Portugal)",
-            status: "Maior Envelhecimento",
-            challenges:
-              "Possuem a população mais velha da Europa devido à baixíssima natalidade e alta longevidade. O desafio é a **sobrecarga nos sistemas de saúde e previdência** (aposentadorias), com menos jovens para sustentar a economia.",
-            color: "text-red-700",
-          },
-          leste: {
-            title: "Europa do Leste (Polônia, Ucrânia, Romênia, Hungria)",
-            status: "Região de Emigração",
-            challenges:
-              "Apesar de historicamente a natalidade ser um pouco maior, a **emigração** (saída) de jovens qualificados em busca de melhores oportunidades no Centro-Oeste é o principal problema. Isso causa despovoamento e falta de mão de obra local.",
-            color: "text-blue-700",
-          },
-          nulo: {
-            title: "Região Selecionada",
-            status: "Clique em um País no Mapa",
-            challenges:
-              "Os países vizinhos também possuem dinâmicas populacionais relevantes. Use o mapa para explorar as três principais tendências de migração e demografia na Europa.",
-            color: "text-slate-500",
-          },
-        };
+            const mapCountryRegion = {
+                DEU: "centro_oeste",
+                FRA: "centro_oeste",
+                GBR: "centro_oeste",
+                NLD: "centro_oeste",
+                BEL: "centro_oeste",
+                IRL: "centro_oeste",
+                ITA: "sul",
+                ESP: "sul",
+                PRT: "sul",
+                GRC: "sul",
+                POL: "leste",
+                ROU: "leste",
+                UKR: "leste",
+                HUN: "leste",
+                SVK: "leste",
+                CZE: "leste",
+            };
 
-        const mapCountryRegion = {
-          DEU: "centro_oeste",
-          FRA: "centro_oeste",
-          GBR: "centro_oeste",
-          NLD: "centro_oeste",
-          BEL: "centro_oeste",
-          IRL: "centro_oeste",
-          ITA: "sul",
-          ESP: "sul",
-          PRT: "sul",
-          GRC: "sul",
-          POL: "leste",
-          ROU: "leste",
-          UKR: "leste",
-          HUN: "leste",
-          SVK: "leste",
-          CZE: "leste",
-        };
+            const blockData = {
+                ue: {
+                    title: "União Europeia (UE)",
+                    type: "Bloco de Integração Econômica e Política (Mercado Comum)",
+                    goals: [
+                        "Mercado Único (Livre circulação de pessoas, bens, serviços e capitais)",
+                        "Moeda Única (Euro, adotada por parte dos membros)",
+                        "Políticas Comuns (Agricultura, Comércio, etc.)",
+                    ],
+                    color: "text-blue-600",
+                },
+                efta: {
+                    title: "Associação Europeia de Livre Comércio (EFTA)",
+                    type: "Zona de Livre Comércio",
+                    goals: [
+                        "Livre comércio e eliminação de tarifas aduaneiras entre os membros",
+                        "Foco principal em bens industriais",
+                        "Menor integração política e sem moeda única (países como Noruega e Suíça)",
+                    ],
+                    color: "text-purple-600",
+                },
+            };
 
-        const blockData = {
-          ue: {
-            title: "União Europeia (UE)",
-            type: "Bloco de Integração Econômica e Política (Mercado Comum)",
-            goals: [
-              "Mercado Único (Livre circulação de pessoas, bens, serviços e capitais)",
-              "Moeda Única (Euro, adotada por parte dos membros)",
-              "Políticas Comuns (Agricultura, Comércio, etc.)",
-            ],
-            color: "text-blue-600",
-          },
-          efta: {
-            title: "Associação Europeia de Livre Comércio (EFTA)",
-            type: "Zona de Livre Comércio",
-            goals: [
-              "Livre comércio e eliminação de tarifas aduaneiras entre os membros",
-              "Foco principal em bens industriais",
-              "Menor integração política e sem moeda única (países como Noruega e Suíça)",
-            ],
-            color: "text-purple-600",
-          },
-        };
+            // --- NAVEGAÇÃO ENTRE SEÇÕES ---
+            const navLinks = document.querySelectorAll(".nav-link");
+            const contentSections = document.querySelectorAll(".content-section");
 
-        // --- NAVEGAÇÃO ENTRE SEÇÕES ---
+            navLinks.forEach((link) => {
+                link.addEventListener("click", () => {
+                    navLinks.forEach((l) => {
+                        l.classList.remove("active", "text-cyan-700", "border-cyan-700");
+                        l.classList.add("border-transparent");
+                    });
+                    link.classList.add("active", "text-cyan-700", "border-cyan-700");
+                    link.classList.remove("border-transparent");
 
-        const navLinks = document.querySelectorAll(".nav-link");
-        const contentSections = document.querySelectorAll(".content-section");
-
-        navLinks.forEach((link) => {
-          link.addEventListener("click", () => {
-            navLinks.forEach((l) => {
-              l.classList.remove("active", "text-cyan-700", "border-cyan-700");
-              l.classList.add("border-transparent");
-            });
-            link.classList.add("active", "text-cyan-700", "border-cyan-700");
-            link.classList.remove("border-transparent");
-
-            const targetId = link.getAttribute("data-target");
-            contentSections.forEach((section) => {
-              section.classList.toggle("hidden", section.id !== targetId);
-            });
-            // Inicializa gráficos/mapas na seção ativa
-            if (targetId === "energia") {
-              if (typeof energyMixChart === "undefined") initEnergyCharts();
-            } else if (targetId === "regioes") {
-              if (typeof europeMapPlotly === "undefined") initMap();
-            }
-          });
-        });
-
-        // --- GRÁFICO DEMOGRAFIA (SEÇÃO 1) ---
-
-        const years = [
-          "1970",
-          "1980",
-          "1990",
-          "2000",
-          "2010",
-          "2020",
-          "2030 (Est.)",
-        ];
-        const birthRate = [17.5, 14.8, 12.5, 10.8, 10.3, 9.8, 9.5];
-        const lifeExpectancy = [71.5, 74.5, 76.8, 78.5, 80.2, 81.5, 82.5];
-
-        document.getElementById("birthRateDisplay").textContent =
-          birthRate[birthRate.length - 2].toFixed(1);
-        document.getElementById("lifeExpectancyDisplay").textContent =
-          lifeExpectancy[lifeExpectancy.length - 2].toFixed(1);
-
-        const ctxDemographic = document
-          .getElementById("demographicChart")
-          .getContext("2d");
-        const demographicChart = new Chart(ctxDemographic, {
-          type: "line",
-          data: {
-            labels: years,
-            datasets: [
-              {
-                label: "Taxa de Natalidade (por 1000 hab.)",
-                data: birthRate,
-                borderColor: "#dc2626",
-                backgroundColor: "rgba(220, 38, 38, 0.1)",
-                tension: 0.3,
-                fill: false,
-              },
-              {
-                label: "Expectativa de Vida (Anos)",
-                data: lifeExpectancy,
-                borderColor: "#16a34a",
-                backgroundColor: "rgba(22, 163, 74, 0.1)",
-                tension: 0.3,
-                fill: false,
-              },
-            ],
-          },
-          options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-              y: {
-                title: { display: true, text: "Valor" },
-                beginAtZero: false,
-              },
-              x: {
-                grid: { display: false },
-              },
-            },
-            plugins: {
-              legend: { position: "top" },
-              tooltip: {
-                callbacks: {
-                  label: function (context) {
-                    let label = context.dataset.label || "";
-                    if (label) {
-                      label += ": ";
+                    const targetId = link.getAttribute("data-target");
+                    contentSections.forEach((section) => {
+                        section.classList.toggle("hidden", section.id !== targetId);
+                    });
+                    // Inicializa gráficos/mapas na seção ativa
+                    if (targetId === "energia") {
+                        if (typeof energyMixChart === "undefined") initEnergyCharts();
+                    } else if (targetId === "regioes") {
+                        if (typeof europeMapPlotly === "undefined") initMap();
                     }
-                    label += context.parsed.y.toFixed(1);
-                    return label;
-                  },
-                },
-              },
-            },
-          },
-        });
-
-        // --- TABS DE DIVERSIDADE (SEÇÃO 2) ---
-
-        const langButtons = document.querySelectorAll(".lang-button");
-        const langContentDiv = document.getElementById("languageContent");
-
-        function updateLanguageContent(group) {
-          const data = langData[group];
-          langContentDiv.innerHTML = `
-                <h3 class="text-xl font-bold text-slate-800 mb-2">${data.title}</h3>
-                <p class="text-slate-700 mb-2">${data.description}</p>
-                <p class="font-semibold text-cyan-700">Exemplos: ${data.examples}</p>
-            `;
-        }
-
-        langButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            langButtons.forEach((btn) => {
-              btn.classList.remove("active", "bg-cyan-600", "text-white");
-              btn.classList.add("bg-slate-200", "text-slate-700");
+                });
             });
-            button.classList.add("active", "bg-cyan-600", "text-white");
-            button.classList.remove("bg-slate-200", "text-slate-700");
 
-            const group = button.getAttribute("data-group");
-            updateLanguageContent(group);
-          });
-        });
+            // --- GRÁFICO DEMOGRAFIA (SEÇÃO 1) ---
+            const years = [
+                "1970",
+                "1980",
+                "1990",
+                "2000",
+                "2010",
+                "2020",
+                "2030 (Est.)",
+            ];
+            const birthRate = [17.5, 14.8, 12.5, 10.8, 10.3, 9.8, 9.5];
+            const lifeExpectancy = [71.5, 74.5, 76.8, 78.5, 80.2, 81.5, 82.5];
 
-        updateLanguageContent("latina");
+            document.getElementById("birthRateDisplay").textContent =
+                birthRate[birthRate.length - 2].toFixed(1);
+            document.getElementById("lifeExpectancyDisplay").textContent =
+                lifeExpectancy[lifeExpectancy.length - 2].toFixed(1);
 
-        // --- MAPA PLOTLY (SEÇÃO 3) ---
-        let europeMapPlotly;
-        const mapTitleEl = document.getElementById("mapTitle");
-        const mapStatusEl = document.getElementById("mapStatus");
-        const mapChallengesEl = document.getElementById("mapChallenges");
-
-        function updateRegionContent(regionKey) {
-          const data = regionData[regionKey] || regionData.nulo;
-          mapTitleEl.textContent = data.title;
-          mapTitleEl.className = `text-xl font-bold mb-2 ${data.color}`;
-          mapStatusEl.textContent = `Status: ${data.status}`;
-          mapChallengesEl.textContent = data.challenges;
-        }
-
-        function initMap() {
-          // Países selecionados para colorir as 3 regiões principais de estudo.
-          const locations = [
-            // Centro-Oeste (Valor 3)
-            "DEU",
-            "FRA",
-            "GBR",
-            "NLD",
-            "BEL",
-            "IRL",
-            // Sul (Valor 2)
-            "ITA",
-            "ESP",
-            "PRT",
-            "GRC",
-            // Leste (Valor 1)
-            "POL",
-            "ROU",
-            "UKR",
-            "HUN",
-            "SVK",
-            "CZE",
-            // Outros (Valor 0, para garantir que o mapa desenhe a Europa)
-            "AUT",
-            "SWE",
-            "NOR",
-            "FIN",
-            "DNK",
-            "CHE",
-            "ISL",
-          ];
-
-          // Mapeando valores Z para as cores (3 = Centro-Oeste, 2 = Sul, 1 = Leste, 0 = Outros)
-          const zValues = locations.map((code) => {
-            if (["DEU", "FRA", "GBR", "NLD", "BEL", "IRL"].includes(code))
-              return 3;
-            if (["ITA", "ESP", "PRT", "GRC"].includes(code)) return 2;
-            if (["POL", "ROU", "UKR", "HUN", "SVK", "CZE"].includes(code))
-              return 1;
-            return 0;
-          });
-
-          const data = [
-            {
-              type: "choropleth",
-              locationmode: "ISO-3",
-              locations: locations,
-              z: zValues,
-              text: locations,
-              autocolorscale: false,
-              colorscale: [
-                [0, "#e5e7eb"], // Cinza (Outros)
-                [0.3, "#7dd3fc"], // Azul Claro (Leste - Emigração)
-                [0.6, "#fca5a5"], // Vermelho Suave (Sul - Envelhecimento)
-                [1, "#6ee7b7"], // Verde Suave (Centro-Oeste - Imigração)
-              ],
-              showscale: false,
-              hoverinfo: "location",
-              marker: { line: { color: "rgba(0,0,0,0.5)", width: 0.5 } },
-            },
-          ];
-
-          const layout = {
-            geo: {
-              scope: "europe",
-              projection: { type: "orthographic" },
-              showland: true,
-              landcolor: "#f3f4f6",
-              subunitcolor: "#ffffff",
-              countrycolor: "#ffffff",
-              showsubunits: true,
-              showcountries: true,
-              resolution: 50,
-              lataxis: { range: [30, 70] },
-              lonaxis: { range: [-25, 40] },
-            },
-            margin: { l: 0, r: 0, t: 0, b: 0 },
-            dragmode: "zoom",
-            width: document.getElementById("europeMap").clientWidth,
-            height: 450,
-          };
-
-          Plotly.newPlot("europeMap", data, layout, {
-            responsive: true,
-            displayModeBar: false,
-          }).then(function (gd) {
-            europeMapPlotly = gd;
-            gd.on("plotly_click", function (data) {
-              if (data.points.length > 0) {
-                const iso3 = data.points[0].location;
-                const regionKey = mapCountryRegion[iso3];
-                if (regionKey) {
-                  updateRegionContent(regionKey);
-                } else {
-                  updateRegionContent("nulo");
-                }
-              }
+            const ctxDemographic = document
+                .getElementById("demographicChart")
+                .getContext("2d");
+            const demographicChart = new Chart(ctxDemographic, {
+                type: "line",
+                data: {
+                    labels: years,
+                    datasets: [
+                        {
+                            label: "Taxa de Natalidade (por 1000 hab.)",
+                            data: birthRate,
+                            borderColor: "#dc2626",
+                            backgroundColor: "rgba(220, 38, 38, 0.1)",
+                            tension: 0.3,
+                            fill: false,
+                        },
+                        {
+                            label: "Expectativa de Vida (Anos)",
+                            data: lifeExpectancy,
+                            borderColor: "#16a34a",
+                            backgroundColor: "rgba(22, 163, 74, 0.1)",
+                            tension: 0.3,
+                            fill: false,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            title: { display: true, text: "Valor" },
+                            beginAtZero: false,
+                        },
+                        x: {
+                            grid: { display: false },
+                        },
+                    },
+                    plugins: {
+                        legend: { position: "top" },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    let label = context.dataset.label || "";
+                                    if (label) {
+                                        label += ": ";
+                                    }
+                                    label += context.parsed.y.toFixed(1);
+                                    return label;
+                                },
+                            },
+                        },
+                    },
+                },
             });
-          });
 
-          updateRegionContent("centro_oeste"); // Inicializa o conteúdo da região
-        }
+            // --- TABS DE DIVERSIDADE (SEÇÃO 2) ---
+            const langButtons = document.querySelectorAll(".lang-button");
+            const langContentDiv = document.getElementById("languageContent");
 
-        // --- GRÁFICOS ENERGIA (SEÇÃO 4) ---
-        let energyMixChart, renewableTrendChart;
-
-        function initEnergyCharts() {
-          const energyMixCtx = document
-            .getElementById("energyMixChart")
-            .getContext("2d");
-          energyMixChart = new Chart(energyMixCtx, {
-            type: "bar",
-            data: {
-              labels: [
-                "Combustíveis Fósseis",
-                "Renováveis (Hidro, Eólica, Solar)",
-                "Nuclear",
-              ],
-              datasets: [
-                {
-                  label: "Consumo % (Estimado)",
-                  data: [70, 20, 10],
-                  backgroundColor: ["#f87171", "#34d399", "#60a5fa"],
-                  borderColor: ["#b91c1c", "#059669", "#2563eb"],
-                  borderWidth: 1,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 100,
-                  ticks: { callback: (value) => value + "%" },
-                },
-              },
-              plugins: { legend: { display: false } },
-            },
-          });
-
-          const trendCtx = document
-            .getElementById("renewableTrendChart")
-            .getContext("2d");
-          renewableTrendChart = new Chart(trendCtx, {
-            type: "line",
-            data: {
-              labels: ["2000", "2010", "2020", "2030 (Meta)"],
-              datasets: [
-                {
-                  label: "Participação das Renováveis na Matriz (%)",
-                  data: [10, 14, 18, 30],
-                  borderColor: "#16a34a",
-                  backgroundColor: "rgba(22, 163, 74, 0.1)",
-                  fill: true,
-                  tension: 0.4,
-                },
-              ],
-            },
-            options: {
-              responsive: true,
-              maintainAspectRatio: false,
-              scales: {
-                y: {
-                  beginAtZero: true,
-                  max: 40,
-                  ticks: { callback: (value) => value + "%" },
-                },
-              },
-              plugins: { legend: { display: false } },
-            },
-          });
-        }
-
-        // --- BLOCOS ECONÔMICOS (SEÇÃO 5) ---
-        const blockButtons = document.querySelectorAll(".block-button");
-        const blockContentDiv = document.getElementById("blockContent");
-
-        function updateBlockContent(block) {
-          const data = blockData[block];
-          const goalsList = data.goals
-            .map(
-              (goal) =>
-                `<li class="flex items-start"><span class="text-lg mr-2">•</span> ${goal}</li>`
-            )
-            .join("");
-
-          blockContentDiv.innerHTML = `
-                <h3 class="text-xl font-bold ${data.color} mb-2">${data.title}</h3>
-                <p class="font-semibold text-slate-800 mb-3">Tipo de Integração: ${data.type}</p>
-                <p class="font-bold text-slate-700">Principais Objetivos:</p>
-                <ul class="list-none space-y-1 text-slate-700 ml-4">${goalsList}</ul>
-            `;
-        }
-
-        blockButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            blockButtons.forEach((btn) => {
-              btn.classList.remove("active", "bg-cyan-600", "text-white");
-              btn.classList.add("bg-slate-200", "text-slate-700");
-            });
-            button.classList.add("active", "bg-cyan-600", "text-white");
-            button.classList.remove("bg-slate-200", "text-slate-700");
-
-            const block = button.getAttribute("data-block");
-            updateBlockContent(block);
-          });
-        });
-
-        updateBlockContent("ue"); // Inicializa a seção de blocos
-
-        // --- QUIZ INTERATIVO (SEÇÃO 6) ---
-
-        const quizButtons = document.querySelectorAll(".quiz-btn");
-
-        quizButtons.forEach((button) => {
-          button.addEventListener("click", () => {
-            const qNum = button.getAttribute("data-q");
-            const questionDiv = document.querySelector(
-              `[data-question="${qNum}"]`
-            );
-            const feedbackEl = document.getElementById(`feedback-q${qNum}`);
-            const correct = questionDiv.getAttribute("data-correct");
-            const selected = document.querySelector(
-              `input[name="q${qNum}"]:checked`
-            );
-
-            feedbackEl.classList.remove(
-              "hidden",
-              "feedback-correct",
-              "feedback-incorrect"
-            );
-
-            if (selected && selected.value === correct) {
-              feedbackEl.textContent = "Correto! Excelente.";
-              feedbackEl.classList.add("feedback-correct");
-            } else {
-              feedbackEl.textContent = `Incorreto. A resposta certa era ${correct}. Revise a seção de estudo!`;
-              feedbackEl.classList.add("feedback-incorrect");
+            function updateLanguageContent(group) {
+                const data = langData[group];
+                langContentDiv.innerHTML = `
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">${data.title}</h3>
+                    <p class="text-slate-700 mb-2">${data.description}</p>
+                    <p class="font-semibold text-cyan-700">Exemplos: ${data.examples}</p>
+                `;
             }
-          });
+
+            langButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    langButtons.forEach((btn) => {
+                        btn.classList.remove("active", "bg-cyan-600", "text-white");
+                        btn.classList.add("bg-slate-200", "text-slate-700");
+                    });
+                    button.classList.add("active", "bg-cyan-600", "text-white");
+                    button.classList.remove("bg-slate-200", "text-slate-700");
+
+                    const group = button.getAttribute("data-group");
+                    updateLanguageContent(group);
+                });
+            });
+
+            updateLanguageContent("latina");
+
+            // --- MAPA PLOTLY (SEÇÃO 3) ---
+            let europeMapPlotly;
+            const mapTitleEl = document.getElementById("mapTitle");
+            const mapStatusEl = document.getElementById("mapStatus");
+            const mapChallengesEl = document.getElementById("mapChallenges");
+
+            function updateRegionContent(regionKey) {
+                const data = regionData[regionKey] || regionData.nulo;
+                mapTitleEl.textContent = data.title;
+                mapTitleEl.className = `text-xl font-bold mb-2 ${data.color}`;
+                mapStatusEl.textContent = `Status: ${data.status}`;
+                mapChallengesEl.textContent = data.challenges;
+            }
+
+            function initMap() {
+                // Países selecionados para colorir as 3 regiões principais de estudo.
+                const locations = [
+                    // Centro-Oeste (Valor 3)
+                    "DEU",
+                    "FRA",
+                    "GBR",
+                    "NLD",
+                    "BEL",
+                    "IRL",
+                    // Sul (Valor 2)
+                    "ITA",
+                    "ESP",
+                    "PRT",
+                    "GRC",
+                    // Leste (Valor 1)
+                    "POL",
+                    "ROU",
+                    "UKR",
+                    "HUN",
+                    "SVK",
+                    "CZE",
+                    // Outros (Valor 0, para garantir que o mapa desenhe a Europa)
+                    "AUT",
+                    "SWE",
+                    "NOR",
+                    "FIN",
+                    "DNK",
+                    "CHE",
+                    "ISL",
+                ];
+
+                // Mapeando valores Z para as cores (3 = Centro-Oeste, 2 = Sul, 1 = Leste, 0 = Outros)
+                const zValues = locations.map((code) => {
+                    if (["DEU", "FRA", "GBR", "NLD", "BEL", "IRL"].includes(code))
+                        return 3;
+                    if (["ITA", "ESP", "PRT", "GRC"].includes(code)) return 2;
+                    if (["POL", "ROU", "UKR", "HUN", "SVK", "CZE"].includes(code))
+                        return 1;
+                    return 0;
+                });
+
+                const data = [
+                    {
+                        type: "choropleth",
+                        locationmode: "ISO-3",
+                        locations: locations,
+                        z: zValues,
+                        text: locations,
+                        autocolorscale: false,
+                        colorscale: [
+                            [0, "#e5e7eb"], // Cinza (Outros)
+                            [0.3, "#7dd3fc"], // Azul Claro (Leste - Emigração)
+                            [0.6, "#fca5a5"], // Vermelho Suave (Sul - Envelhecimento)
+                            [1, "#6ee7b7"], // Verde Suave (Centro-Oeste - Imigração)
+                        ],
+                        showscale: false,
+                        hoverinfo: "location",
+                        marker: { line: { color: "rgba(0,0,0,0.5)", width: 0.5 } },
+                    },
+                ];
+
+                const layout = {
+                    geo: {
+                        scope: "europe",
+                        projection: { type: "orthographic" },
+                        showland: true,
+                        landcolor: "#f3f4f6",
+                        subunitcolor: "#ffffff",
+                        countrycolor: "#ffffff",
+                        showsubunits: true,
+                        showcountries: true,
+                        resolution: 50,
+                        lataxis: { range: [30, 70] },
+                        lonaxis: { range: [-25, 40] },
+                    },
+                    margin: { l: 0, r: 0, t: 0, b: 0 },
+                    dragmode: "zoom",
+                    width: document.getElementById("europeMap").clientWidth,
+                    height: 400,
+                };
+
+                Plotly.newPlot("europeMap", data, layout, {
+                    responsive: true,
+                    displayModeBar: false,
+                }).then(function (gd) {
+                    europeMapPlotly = gd;
+                    gd.on("plotly_click", function (data) {
+                        if (data.points.length > 0) {
+                            const iso3 = data.points[0].location;
+                            const regionKey = mapCountryRegion[iso3];
+                            if (regionKey) {
+                                updateRegionContent(regionKey);
+                            } else {
+                                updateRegionContent("nulo");
+                            }
+                        }
+                    });
+                });
+
+                updateRegionContent("centro_oeste"); // Inicializa o conteúdo da região
+            }
+
+            // --- GRÁFICOS ENERGIA (SEÇÃO 4) ---
+            let energyMixChart, renewableTrendChart;
+
+            function initEnergyCharts() {
+                const energyMixCtx = document
+                    .getElementById("energyMixChart")
+                    .getContext("2d");
+                energyMixChart = new Chart(energyMixCtx, {
+                    type: "bar",
+                    data: {
+                        labels: [
+                            "Combustíveis Fósseis",
+                            "Renováveis (Hidro, Eólica, Solar)",
+                            "Nuclear",
+                        ],
+                        datasets: [
+                            {
+                                label: "Consumo % (Estimado)",
+                                data: [70, 20, 10],
+                                backgroundColor: ["#f87171", "#34d399", "#60a5fa"],
+                                borderColor: ["#b91c1c", "#059669", "#2563eb"],
+                                borderWidth: 1,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 100,
+                                ticks: { callback: (value) => value + "%" },
+                            },
+                        },
+                        plugins: { legend: { display: false } },
+                    },
+                });
+
+                const trendCtx = document
+                    .getElementById("renewableTrendChart")
+                    .getContext("2d");
+                renewableTrendChart = new Chart(trendCtx, {
+                    type: "line",
+                    data: {
+                        labels: ["2000", "2010", "2020", "2030 (Meta)"],
+                        datasets: [
+                            {
+                                label: "Participação das Renováveis na Matriz (%)",
+                                data: [10, 14, 18, 30],
+                                borderColor: "#16a34a",
+                                backgroundColor: "rgba(22, 163, 74, 0.1)",
+                                fill: true,
+                                tension: 0.4,
+                            },
+                        ],
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: 40,
+                                ticks: { callback: (value) => value + "%" },
+                            },
+                        },
+                        plugins: { legend: { display: false } },
+                    },
+                });
+            }
+
+            // --- BLOCOS ECONÔMICOS (SEÇÃO 5) ---
+            const blockButtons = document.querySelectorAll(".block-button");
+            const blockContentDiv = document.getElementById("blockContent");
+
+            function updateBlockContent(block) {
+                const data = blockData[block];
+                const goalsList = data.goals
+                    .map(
+                        (goal) =>
+                            `<li class="flex items-start"><span class="text-lg mr-2">•</span> ${goal}</li>`
+                    )
+                    .join("");
+
+                blockContentDiv.innerHTML = `
+                    <h3 class="text-xl font-bold ${data.color} mb-2">${data.title}</h3>
+                    <p class="font-semibold text-slate-800 mb-3">Tipo de Integração: ${data.type}</p>
+                    <p class="font-bold text-slate-700">Principais Objetivos:</p>
+                    <ul class="list-none space-y-1 text-slate-700 ml-4">${goalsList}</ul>
+                `;
+            }
+
+            blockButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    blockButtons.forEach((btn) => {
+                        btn.classList.remove("active", "bg-cyan-600", "text-white");
+                        btn.classList.add("bg-slate-200", "text-slate-700");
+                    });
+                    button.classList.add("active", "bg-cyan-600", "text-white");
+                    button.classList.remove("bg-slate-200", "text-slate-700");
+
+                    const block = button.getAttribute("data-block");
+                    updateBlockContent(block);
+                });
+            });
+
+            updateBlockContent("ue"); // Inicializa a seção de blocos
+
+            // --- QUIZ INTERATIVO (SEÇÃO 6) ---
+            const quizButtons = document.querySelectorAll(".quiz-btn");
+
+            quizButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    const qNum = button.getAttribute("data-q");
+                    const questionDiv = document.querySelector(
+                        `[data-question="${qNum}"]`
+                    );
+                    const feedbackEl = document.getElementById(`feedback-q${qNum}`);
+                    const correct = questionDiv.getAttribute("data-correct");
+                    const selected = document.querySelector(
+                        `input[name="q${qNum}"]:checked`
+                    );
+
+                    feedbackEl.classList.remove(
+                        "hidden",
+                        "feedback-correct",
+                        "feedback-incorrect"
+                    );
+
+                    if (selected && selected.value === correct) {
+                        feedbackEl.textContent = "Correto! Excelente.";
+                        feedbackEl.classList.add("feedback-correct");
+                    } else {
+                        feedbackEl.textContent = `Incorreto. A resposta certa era ${correct}. Revise a seção de estudo!`;
+                        feedbackEl.classList.add("feedback-incorrect");
+                    }
+                });
+            });
         });
-      });
     </script>
-  </body>
+</body>
 </html>
